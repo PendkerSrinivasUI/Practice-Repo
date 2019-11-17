@@ -58,7 +58,6 @@ export class AppComponent implements OnInit {
     this.apiService.get_service(ApiService.apiList.vehcles).subscribe(
       response => {
         this.vehicles = response;
-
         this.destinationList.forEach(element=>{
           Object.assign(element.vehicles,this.vehicles)
         })
@@ -67,7 +66,6 @@ export class AppComponent implements OnInit {
       }
     )
   }
-
   getAllPlanets() {
     this.apiService.get_service(ApiService.apiList.planets).subscribe(
       response => {
@@ -83,18 +81,8 @@ export class AppComponent implements OnInit {
 
   getSelectedPlanet(planet, planetIndex) {
     console.log(planet);
-  // var firstVehcle = [{"name":"Space pod1","total_no":2,"max_distance":200,"speed":2},{"name":"Space rocket1","total_no":1,"max_distance":300,"speed":4},{"name":"Space shuttle1","total_no":1,"max_distance":400,"speed":5},{"name":"Space ship1","total_no":2,"max_distance":600,"speed":10}]
-  // var secondVehcle = [{"name":"Space pod2","total_no":2,"max_distance":200,"speed":2},{"name":"Space rocket2","total_no":1,"max_distance":300,"speed":4},{"name":"Space shuttle2","total_no":1,"max_distance":400,"speed":5},{"name":"Space ship2","total_no":2,"max_distance":600,"speed":10}]
-  //   if(planetIndex){
-  //     this.individualDestinationObj[planetIndex]=secondVehcle;
-  //   }else{
-  //     this.individualDestinationObj[planetIndex]=firstVehcle;
-  //   }
     if(planetIndex){
-       let tempVehcles = this.individualDestinationObj[planetIndex-1];
-      // for(let obj of tempVehcles){
-      //   obj['name']=obj['name']+planetIndex;
-      // }
+      let tempVehcles = this.individualDestinationObj[planetIndex-1];
       var duplicateTempVehicles = [];
       for (let i = 0; i < tempVehcles.length; i++) {
         var vehcletotemptest = {
@@ -103,7 +91,6 @@ export class AppComponent implements OnInit {
           "max_distance":tempVehcles[i].max_distance,
           "speed":tempVehcles[i].speed,
         }
-
         duplicateTempVehicles.push(vehcletotemptest)
       }
       this.individualDestinationObj[planetIndex] = duplicateTempVehicles;
@@ -149,6 +136,7 @@ export class AppComponent implements OnInit {
           this.planets[idx].distance
             if(vehcle.max_distance < this.planets[idx].distance){
                   alert('the vehicle max_distance is less than destination distance')
+                  this.destinationList[destIndex].selectedVehicle = ""
               }else{
                 if(this.destinationObj[destIndex] != "")
                   {
@@ -159,12 +147,10 @@ export class AppComponent implements OnInit {
                     this.destinationObj[destIndex] = vehcle.name;
                     this.destinationList[destIndex].selectedVehicle = vehcle.name;
                     this.timeTakenToReach = (this.planets[idx].distance)/vehcle.speed;
-                    console.log(this.timeTakenToReach,this.destinationList[destIndex].selectedVehicle);
                 }
             }
           }
-          console.log(this.selectedVehicles)
-          }
+       }
   
   findFolcon(){
     console.log(new Set(this.selectedPlanets));
