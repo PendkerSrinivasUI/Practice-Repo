@@ -11,7 +11,7 @@ export class AppComponent implements OnInit {
   title = 'FalconFind';
   authToken: string;
   vehicles = [];
-  selectBoxes = 4;
+  selectedVehicles = [];
   planets = [];
   vehgdfgdfgdficle: ""
   destination1: any;
@@ -20,6 +20,14 @@ export class AppComponent implements OnInit {
   destination4: any;
   selectedPlanets = [];
   temPPlanet: string;
+  destinationObj = {
+    0:"",
+    1:"",
+    2:"",
+    3:""
+  };
+
+  individualDestinationObj = {};
   timeTakenToReach: number;
   destinationList = [
     { name: "Destination1", planets: [], selectedPlanet: "", vehicles:[], selectedVehicle: "" },
@@ -38,7 +46,8 @@ export class AppComponent implements OnInit {
   getAuthToken() {
     this.apiService.post_service(ApiService.apiList.getToken, {}).subscribe(
       response => {
-        localStorage.setItem('authToken', response.token)
+        localStorage.setItem('authToken', response.token);
+        this.authToken = localStorage.getItem('authToken');
       }, error => {
         alert(error)
       }
@@ -49,6 +58,7 @@ export class AppComponent implements OnInit {
     this.apiService.get_service(ApiService.apiList.vehcles).subscribe(
       response => {
         this.vehicles = response;
+
         this.destinationList.forEach(element=>{
           Object.assign(element.vehicles,this.vehicles)
         })
@@ -73,6 +83,45 @@ export class AppComponent implements OnInit {
 
   getSelectedPlanet(planet, planetIndex) {
     console.log(planet);
+  // var firstVehcle = [{"name":"Space pod1","total_no":2,"max_distance":200,"speed":2},{"name":"Space rocket1","total_no":1,"max_distance":300,"speed":4},{"name":"Space shuttle1","total_no":1,"max_distance":400,"speed":5},{"name":"Space ship1","total_no":2,"max_distance":600,"speed":10}]
+  // var secondVehcle = [{"name":"Space pod2","total_no":2,"max_distance":200,"speed":2},{"name":"Space rocket2","total_no":1,"max_distance":300,"speed":4},{"name":"Space shuttle2","total_no":1,"max_distance":400,"speed":5},{"name":"Space ship2","total_no":2,"max_distance":600,"speed":10}]
+  //   if(planetIndex){
+  //     this.individualDestinationObj[planetIndex]=secondVehcle;
+  //   }else{
+  //     this.individualDestinationObj[planetIndex]=firstVehcle;
+  //   }
+    if(planetIndex){
+       let tempVehcles = this.individualDestinationObj[planetIndex-1];
+      // for(let obj of tempVehcles){
+      //   obj['name']=obj['name']+planetIndex;
+      // }
+      var duplicateTempVehicles = [];
+      for (let i = 0; i < tempVehcles.length; i++) {
+        var vehcletotemptest = {
+          "name":tempVehcles[i].name,
+          "total_no":tempVehcles[i].total_no,
+          "max_distance":tempVehcles[i].max_distance,
+          "speed":tempVehcles[i].speed,
+        }
+
+        duplicateTempVehicles.push(vehcletotemptest)
+      }
+      this.individualDestinationObj[planetIndex] = duplicateTempVehicles;
+    }else{
+       var duplicateVehicles = [];
+      for (let i = 0; i < this.vehicles.length; i++) {
+        var vehcletotest = {
+          "name":this.vehicles[i].name,
+          "total_no":this.vehicles[i].total_no,
+          "max_distance":this.vehicles[i].max_distance,
+          "speed":this.vehicles[i].speed,
+        }
+
+         duplicateVehicles.push(vehcletotest)
+      }
+      this.individualDestinationObj[planetIndex]=duplicateVehicles;
+    }
+    this.destinationList[planetIndex].selectedVehicle = "";
     if (this.temPPlanet) {
       for (let i = 0; i < this.destinationList.length; i++) {
         if (i != planetIndex) {
@@ -95,22 +144,42 @@ export class AppComponent implements OnInit {
   getSelectedVehicle(vehcle,planet,destIndex) {
     console.log(vehcle);
     if (vehcle) {
-        let idx = this.planets.findIndex(item => item.name == planet)
-        if(idx > -1){
+      let idx = this.planets.findIndex(item => item.name == planet)
+      if(idx > -1){
           this.planets[idx].distance
             if(vehcle.max_distance < this.planets[idx].distance){
-                alert('the vehicle max_distance is less than destination distance')
-            }else{
-                this.vehicles.find(item=>item.name==vehcle.name).total_no = this.vehicles.find(item=>item.name==vehcle.name).total_no - 1;
-                this.destinationList[destIndex].selectedVehicle = vehcle.name;
-                this.timeTakenToReach = (this.planets[idx].distance)/vehcle.speed;
-                console.log(this.timeTakenToReach,this.vehicles);
+                  alert('the vehicle max_distance is less than destination distance')
+              }else{
+                if(this.destinationObj[destIndex] != "")
+                  {
+                    let vehcleObj = this.individualDestinationObj[destIndex].find(item =>item.name == this.destinationObj[destIndex])
+                    vehcleObj.total_no +=1; 
+                  }
+                    vehcle.total_no -=1;
+                    this.destinationObj[destIndex] = vehcle.name;
+                    this.destinationList[destIndex].selectedVehicle = vehcle.name;
+                    this.timeTakenToReach = (this.planets[idx].distance)/vehcle.speed;
+                    console.log(this.timeTakenToReach,this.destinationList[destIndex].selectedVehicle);
+                }
             }
-        }
-    }
-  }
+          }
+          console.log(this.selectedVehicles)
+          }
+  
   findFolcon(){
     console.log(new Set(this.selectedPlanets));
+    let requestObj = {
+      token:this.authToken,
+      planet_names:new Set(this.selectedPlanets),
+      vehicle_names:this.selectedVehicles
+    }
+    this.apiService.post_service(ApiService.apiList.findVehcle,requestObj).subscribe(
+      response => {
+      alert(response)
+      }, error => {
+        alert(error)
+      }
+    )
   }
 
   onFocus(planet,destIndex) {
