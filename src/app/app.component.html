@@ -13,7 +13,6 @@
         <option *ngFor="let item of dest.planets;let j=index" [value]="item.name">{{item.name}}</option>
       </select>
       <div class="col-md-9" *ngIf="dest.selectedPlanet">
-        <p>{{dest.selectedVehicle}}</p>
           <div class="radio" *ngFor="let vehicle of individualDestinationObj[i]">
             <label class="mb-0 pull-left mr-3" [ngClass]="{'disable':!vehicle?.total_no}">
               <input type="radio"  [name]="'optradio'+i" [(ngModel)]="dest.selectedVehicle" (change)="getSelectedVehicle(vehicle,dest.selectedPlanet,i)" [value]="vehicle.name">{{vehicle.name}}({{vehicle.total_no}})</label>

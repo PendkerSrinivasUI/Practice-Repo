@@ -136,7 +136,6 @@ export class AppComponent implements OnInit {
           this.planets[idx].distance
             if(vehcle.max_distance < this.planets[idx].distance){
                   alert('the vehicle max_distance is less than destination distance')
-                  this.destinationList[destIndex].selectedVehicle = ""
               }else{
                 if(this.destinationObj[destIndex] != "")
                   {
@@ -150,13 +149,13 @@ export class AppComponent implements OnInit {
                 }
             }
           }
-       }
+      }
   
   findFolcon(){
     console.log(new Set(this.selectedPlanets));
     let requestObj = {
       token:this.authToken,
-      planet_names:new Set(this.selectedPlanets),
+      planet_names:this.selectedPlanets,
       vehicle_names:this.selectedVehicles
     }
     this.apiService.post_service(ApiService.apiList.findVehcle,requestObj).subscribe(
